@@ -155,17 +155,34 @@ file = nc.Dataset(path+nname,'a')
 
 # First rename the variable names
 for wmo_var_name, wmo_var_atts in wmo_atts.items():
-    
+
     # if the wmo variable name is not found in the file
     if wmo_var_name not in file.variables:
-        
+
         # try to find a similar name
         for old_name in namelist[wmo_var_name]:
-            
+
             if old_name in file.variables:
                 # success! rename
                 file.renameVariable(old_name,wmo_var_name)
-                
+
+
+# Now check the attributes
+for file_var_name, file_var_atts in file.variables.items():
+
+    # save a copy of the attributes    
+
+    # if the variable is a wmo requirement
+    if file_var_name in wmo_atts:
+
+        for att in wmo_atts[file_var_name].items():
+            if att[0] == 'long_name':
+                if 'standard_name' in file.variables[file_var_name].ncattrs():
+                    file.variables[file_var_name].delncattr('standard_name')
+
+            file.variables[file_var_name].setncattr(att[0], att[1])
+            
+      
 file.close()        
         
         
