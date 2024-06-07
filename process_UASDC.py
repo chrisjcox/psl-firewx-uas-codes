@@ -21,29 +21,77 @@
 #                    prompted for monitoring of UASDC Data Pipeline for
 #                    successful deposit to product bucket.                     
 #
-#  USAGE        : python3 process_UASDC -o 007 -a AstonMartinDB5 -t 19641222000000
-#                                          |      |                 | 
-#                                          v      v                 v
-#                                          opID   airframeID        yyyymmddhhmmss
+#  USAGE        : python3 process_UASDC.py -o 007 -a AstonMartinDB5 -t 19641222000000 -d /Users/Connery/London/ -f goldfinger.nc
+#                                             |      |                 |                 |
+#                                             v      v                 v                 v
+#                 arguments                   opID   airframeID        yyyymmddhhmmss    base directory
+#
+#  PREP         : Create two folders, RAW and STAGE in the base directory,
+#                 which is the directory you specify as an argument when
+#                 executing the function. When you transfer a file from the 
+#                 ground station, store in in RAW then ecexute this code.
 # 
 #  DEPENDENCIES : netCDF4 1.6.2+, Boto3 Python module supported for Python 3.8+ 
 
-    
-import argparse
+#python3 process_UASDC.py -o 007 -a AstonMartinDB5 -t 19641222000000 -d /Users/ccox/Documents/Projects/2024/FireWeather/compare_files/ -f 20240501221756_Lat_47.5738578_Lon_9.0461255.nc
 
-# arguments
+# Prologue    
+import argparse, shutil, sys
+from PSL_UASDC_check_attributes import check_vars_atts
+from PSL_UASDC_uploadfiles import upload_file
+
+# parse arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-o', '--operatorID', metavar='str', help='Operator ID')
 parser.add_argument('-a', '--airframeID', metavar='str', help='Airframe ID')
 parser.add_argument('-t', '--flighttime', metavar='str', help='Flight time yyyymmddhhmmss')
+parser.add_argument('-d', '--basedir', metavar='str', help='Parent directory of RAW and STAGE')
+parser.add_argument('-f', '--filename', metavar='str', help='File to process. If not provided, all files in RAW will be processed.')
 args = parser.parse_args()
 
+if args.operatorID: operatorID = args.operatorID
+if args.airframeID: airframeID = args.airframeID
+if args.flighttime: flighttime = args.flighttime
+if args.basedir:    base_dir = args.basedir
+if args.filename:   fname = args.filename
+
+#operatorID = '007'
+#airframeID = 'AstonMartinDB5'
+#flighttime = '19641222000000'
+#base_dir = '/Users/ccox/Documents/Projects/2024/FireWeather/compare_files/'
+#fname = '20240501221756_Lat_47.5738578_Lon_9.0461255.nc'
+
+if flighttime[-1] != 'z':
+    flighttime = flighttime+'z'
+
+if base_dir[-1] != '/':
+    base_dir = base_dir+'/'
 
 
+# # # STEP 1. Move and rename the file  # # #
+
+# format: UASDC_operatorID_airframeID_YYYYMMDDHHMMSSZ.nc
+new_fname = 'UASDC_'+operatorID+'_'+airframeID+'_'+flighttime+'.nc'
+
+# copy file from RAW to STAGE, renaming as we go
+shutil.copyfile(base_dir+'RAW/'+fname, base_dir+'STAGE/'+new_fname)
 
 
+# # # STEP 2. Check vars and atts # # #
+
+check_vars_atts(base_dir+'STAGE/',new_fname)
 
 
+# # # STEP 3. Upload
+
+proceed = input('    Your file is ready to upload to the bucket. Would you like to proceed? enter y or n: ')
+
+if proceed == 'n':
+    print('    Exiting without upload to bucket.')
+    sys.exit()
+else:
+    upload_file(base_dir+'STAGE/',new_fname)
+    
 
 
 

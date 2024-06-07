@@ -13,143 +13,116 @@
 #
 #  DEPENDENCIES : netCDF4 1.6.2+ 
 
+def check_vars_atts(path,fname):
     
-import netCDF4 as nc
-import argparse, shutil
-from wmo_definitions import define_wmo_globals, define_wmo_atts, define_alt_names
+    import netCDF4 as nc
+    from wmo_definitions import define_wmo_globals, define_wmo_atts, define_alt_names
 
-
-# assign wmo_definitions
-global_atts = define_wmo_globals()
-wmo_atts = define_wmo_atts()
-namelist = define_alt_names()
-
-# arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('-o', '--operatorID', metavar='str', help='Operator ID')
-parser.add_argument('-a', '--airframeID', metavar='str', help='Airframe ID')
-parser.add_argument('-t', '--flighttime', metavar='str', help='Flight time yyyymmddhhmmss')
-args = parser.parse_args()
-
-
-# These should be arguments passed
-operatorID = 'nnn'
-airframeID = 'nnn'
-yyyymmddhhmmssz = '20240502023139Z'
-
-print('Checking and correcting UASDC formatting')
-
-# STEP 1. Create a copy of the file and rename.
-
-path  = '/Users/ccox/Documents/Projects/2024/FireWeather/compare_files/'
-fname = '20240501221756_Lat_47.5738578_Lon_9.0461255.nc'
-
-# format: UASDC_operatorID_airframeID_YYYYMMDDHHMMSSZ.nc
-nname = 'UASDC_'+operatorID+'_'+airframeID+'_'+yyyymmddhhmmssz+'.nc'
-
-
-shutil.copyfile(path+fname, path+nname)
-
-file = nc.Dataset(path+nname,'a')
-
-
-
-# # # First rename the variable names # # # 
-
-for wmo_var_name, wmo_var_atts in wmo_atts.items():
-
-    # if the wmo variable name is not found in the file
-    if wmo_var_name not in file.variables:
-
-        # try to find a similar name
-        for old_name in namelist[wmo_var_name]:
-
-            if old_name in file.variables:
-                # success! rename
-                file.renameVariable(old_name,wmo_var_name)
-
-
-
-# # # Now check the attributes # # # 
-
-for file_var_name, file_var_atts in file.variables.items():
+    # assign wmo_definitions
+    global_atts = define_wmo_globals()
+    wmo_atts = define_wmo_atts()
+    namelist = define_alt_names()
     
-    # if the variable in the file is not requried by WMO, we will still update 
-    # the attributes to be consistent
-    if file_var_name not in wmo_atts:
-        
-        # make a dictionary of all attributes and delete the att
-        attdict = dict()        
-        for att in file.variables[file_var_name].ncattrs():
-            attdict.update({att:file.variables[file_var_name].getncattr(att)})
-            file.variables[file_var_name].delncattr(att)
+    print('    Checking and correcting UASDC formatting')   
 
-        # the first att will be fill value
-        file.variables[file_var_name].setncattr(file_var_name+'__FillValue','NaN')
-       
-        for att in attdict.items():
-            
-            if att[0] == 'standard_name':
-                file.variables[file_var_name].setncattr('long_name',att[1])
-            else:
-                file.variables[file_var_name].setncattr(att[0],att[1])
-        
-    # if the variable is a wmo requirement
-    elif file_var_name in wmo_atts:
-        
-        # make a dictionary of all attributes and delete the att
-        attdict = dict()        
-        for att in file.variables[file_var_name].ncattrs():
-            attdict.update({att:file.variables[file_var_name].getncattr(att)})
-            file.variables[file_var_name].delncattr(att)
+    file = nc.Dataset(path+fname,'a')
 
-        # write wmo atts
-        for att in wmo_atts[file_var_name].items():    
-            if 'FillValue' in att:
-                file.variables[file_var_name].setncattr(file_var_name+'__FillValue','NaN')
-            else:
-                file.variables[file_var_name].setncattr(att[0], att[1])
+    # # # First rename the variable names # # # 
+    
+    for wmo_var_name, wmo_var_atts in wmo_atts.items():
+    
+        # if the wmo variable name is not found in the file
+        if wmo_var_name not in file.variables:
+    
+            # try to find a similar name
+            for old_name in namelist[wmo_var_name]:
+    
+                if old_name in file.variables:
+                    # success! rename
+                    file.renameVariable(old_name,wmo_var_name)
+    
+    
+    
+    # # # Now check the attributes # # # 
+    
+    for file_var_name, file_var_atts in file.variables.items():
+        
+        # if the variable in the file is not requried by WMO, we will still update 
+        # the attributes to be consistent
+        if file_var_name not in wmo_atts:
             
-        # write any extra atts that remain    
-        for att in attdict.items():  
-            if att not in file.variables[file_var_name].ncattrs():
-                if att[0] != 'standard_name':
+            # make a dictionary of all attributes and delete the att
+            attdict = dict()        
+            for att in file.variables[file_var_name].ncattrs():
+                attdict.update({att:file.variables[file_var_name].getncattr(att)})
+                file.variables[file_var_name].delncattr(att)
+    
+            # the first att will be fill value
+            file.variables[file_var_name].setncattr(file_var_name+'__FillValue','NaN')
+           
+            for att in attdict.items():
+                
+                if att[0] == 'standard_name':
+                    file.variables[file_var_name].setncattr('long_name',att[1])
+                else:
                     file.variables[file_var_name].setncattr(att[0],att[1])
-
-
-
-# # # Finally, check global attributes # # # 
-
-# make a dictionary of all attributes and delete the att
-attdict = dict()        
-for att in file.ncattrs():
-    attdict.update({att:file.getncattr(att)})
-    file.delncattr(att)
-
-# write the globals wmo expects                    
-for att in global_atts.items():
- 
-    if att[0] not in attdict: 
-        print('Warning: '+att[0]+' not found in file global attributes')    
-
-    if att[0] == 'platform_name':
-        file.setncattr('platform_name',attdict['platform_name'])
-    elif att[0] == 'flight_id':
-        file.setncattr('flight_id',attdict['flight_id'])   
-    elif att[0] == 'processing_level':
-        file.setncattr('processing_level','raw') 
-        print('Assigning processing level to raw.')
-    else:
-        file.setncattr(att[0],att[1]) 
+            
+        # if the variable is a wmo requirement
+        elif file_var_name in wmo_atts:
+            
+            # make a dictionary of all attributes and delete the att
+            attdict = dict()        
+            for att in file.variables[file_var_name].ncattrs():
+                attdict.update({att:file.variables[file_var_name].getncattr(att)})
+                file.variables[file_var_name].delncattr(att)
     
-    if att[0] in attdict:
-        del attdict[att[0]]
-
- # write extra globals
-for att in attdict.items():
-    file.setncattr(att[0],att[1]) 
+            # write wmo atts
+            for att in wmo_atts[file_var_name].items():    
+                if 'FillValue' in att:
+                    file.variables[file_var_name].setncattr(file_var_name+'__FillValue','NaN')
+                else:
+                    file.variables[file_var_name].setncattr(att[0], att[1])
+                
+            # write any extra atts that remain    
+            for att in attdict.items():  
+                if att not in file.variables[file_var_name].ncattrs():
+                    if att[0] != 'standard_name':
+                        file.variables[file_var_name].setncattr(att[0],att[1])
+    
+    
+    
+    # # # Finally, check global attributes # # # 
+    
+    # make a dictionary of all attributes and delete the att
+    attdict = dict()        
+    for att in file.ncattrs():
+        attdict.update({att:file.getncattr(att)})
+        file.delncattr(att)
+    
+    # write the globals wmo expects                    
+    for att in global_atts.items():
+     
+        if att[0] not in attdict: 
+            print('    Warning: '+att[0]+' not found in file global attributes')    
+    
+        if att[0] == 'platform_name':
+            file.setncattr('platform_name',attdict['platform_name'])
+        elif att[0] == 'flight_id':
+            file.setncattr('flight_id',attdict['flight_id'])   
+        elif att[0] == 'processing_level':
+            file.setncattr('processing_level','raw') 
+            print('    Assigning processing level to raw.')
+        else:
+            file.setncattr(att[0],att[1]) 
         
-file.close()
+        if att[0] in attdict:
+            del attdict[att[0]]
+    
+     # write extra globals
+    for att in attdict.items():
+        file.setncattr(att[0],att[1]) 
+            
+    file.close()
 
         
         
