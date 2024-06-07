@@ -15,8 +15,10 @@
 
 def check_vars_atts(path,fname):
     
+    import os, sys
     import netCDF4 as nc
     from wmo_definitions import define_wmo_globals, define_wmo_atts, define_alt_names
+    from datetime import datetime
 
     # assign wmo_definitions
     global_atts = define_wmo_globals()
@@ -24,10 +26,37 @@ def check_vars_atts(path,fname):
     namelist = define_alt_names()
     
     print('    Checking and correcting UASDC formatting')   
-
+    print('')
+    
+    
+    # open the file
     file = nc.Dataset(path+fname,'a')
+    
+    
+    # # # STEP 1. Change the time stamp from seconds since flight to epoch # # #
+    
+    if os.path.exists(path+fname):
+        
+        print('')
+        proceed = input('    The file already exists in STAGE. Do you want to overwirte it? enter y or n: ')
+        print('')
+        
+        if proceed == 'n':
+            print('    Exiting. Nothing was accomplished.')
+            print('')
+            sys.exit()
 
-    # # # First rename the variable names # # # 
+    # We need to change the values of the time stamp, which are in seconds 
+    # since flight time, but need to be seconds since epoch
+    time_var = file.variables['time']
+    epoch = datetime(1970, 1, 1)
+    add_offset = (datetime.strptime(fname[-18:-4], '%Y%m%d%H%M%S') - epoch).total_seconds()
+    # check to make sure there isn't already epoch formatting
+    if max(time_var) < 86400:
+        time_var[:] = time_var[:]+add_offset
+     
+
+    # # # STEP 2. Rename the variable names # # # 
     
     for wmo_var_name, wmo_var_atts in wmo_atts.items():
     
@@ -43,7 +72,7 @@ def check_vars_atts(path,fname):
     
     
     
-    # # # Now check the attributes # # # 
+    # # # STEP 3. Check the attributes # # # 
     
     for file_var_name, file_var_atts in file.variables.items():
         
@@ -78,7 +107,7 @@ def check_vars_atts(path,fname):
     
             # write wmo atts
             for att in wmo_atts[file_var_name].items():    
-                if 'FillValue' in att:
+                if att[0] == 'varname__FillValue':
                     file.variables[file_var_name].setncattr(file_var_name+'__FillValue','NaN')
                 else:
                     file.variables[file_var_name].setncattr(att[0], att[1])
@@ -91,7 +120,7 @@ def check_vars_atts(path,fname):
     
     
     
-    # # # Finally, check global attributes # # # 
+    # # # STEP 4. Check global attributes # # # 
     
     # make a dictionary of all attributes and delete the att
     attdict = dict()        

@@ -16,6 +16,9 @@
 #                   python3 openS3.py -t entry   
 #                 This would show contents of the UASDC product bucket:
 #                   python3 openS3.py -t product
+#                 Optionally, you can also -i NNN to specify the OperatorID,
+#                 which is useful because without it output is truncated for
+#                 populous folders.                    
 #
 #  DEPENDENCIES : Boto3 Python module supported for Python 3.8+ 
 
@@ -28,9 +31,14 @@ from access_info import access_info
 
 # entry if you want to see the entry bucket, product if you want to see the product bucket, buckets if you want a list of available buckets.
 parser = argparse.ArgumentParser()
-parser.add_argument('-t', '--task', metavar='str', help='Operator ID')
+parser.add_argument('-t', '--task', metavar='str', help='Where do you want to look: buckets, product, or entry?')
+parser.add_argument('-i', '--id', metavar='str', help='Operator ID')
 args = parser.parse_args()
+task = ''
+opid = ''
 if args.task: task = args.task
+if args.id: opid = args.id+'/'
+
 
 # this information is stored in a separate file, access_info.py
 username, aws_key, aws_secret_key, entry_bucket, product_bucket = access_info()
@@ -53,8 +61,9 @@ if task == 'entry':
 
     print('    Printing contents of UASDC entry bucket:')
     print('')
+
     conn = client('s3')  # again assumes boto.cfg setup, assume AWS S3
-    for key in conn.list_objects(Bucket=***REMOVED***)['Contents']: print(key['Key'])    
+    for key in conn.list_objects(Bucket=entry_bucket,Prefix=opid)['Contents']: print(key['Key'])    
     print('')
 
 elif task == 'product':
@@ -62,7 +71,7 @@ elif task == 'product':
     print('    Printing contents of UASDC product bucket:')
     print('')
     conn = client('s3')  # again assumes boto.cfg setup, assume AWS S3
-    for key in conn.list_objects(Bucket=***REMOVED***)['Contents']: print(key['Key'])
+    for key in conn.list_objects(Bucket=product_bucket,Prefix=opid)['Contents']: print(key['Key'])
     print('')
 
 elif task == 'buckets':

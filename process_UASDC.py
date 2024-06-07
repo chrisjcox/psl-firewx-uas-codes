@@ -46,7 +46,7 @@ parser.add_argument('-o', '--operatorID', metavar='str', help='Operator ID')
 parser.add_argument('-a', '--airframeID', metavar='str', help='Airframe ID')
 parser.add_argument('-t', '--flighttime', metavar='str', help='Flight time yyyymmddhhmmss')
 parser.add_argument('-d', '--basedir', metavar='str', help='Parent directory of RAW and STAGE')
-parser.add_argument('-f', '--filename', metavar='str', help='File to process. If not provided, all files in RAW will be processed.')
+parser.add_argument('-f', '--filename', metavar='str', help='File to process')
 args = parser.parse_args()
 
 if args.operatorID: operatorID = args.operatorID
@@ -55,14 +55,8 @@ if args.flighttime: flighttime = args.flighttime
 if args.basedir:    base_dir = args.basedir
 if args.filename:   fname = args.filename
 
-#operatorID = '007'
-#airframeID = 'AstonMartinDB5'
-#flighttime = '19641222000000'
-#base_dir = '/Users/ccox/Documents/Projects/2024/FireWeather/compare_files/'
-#fname = '20240501221756_Lat_47.5738578_Lon_9.0461255.nc'
-
-if flighttime[-1] != 'z':
-    flighttime = flighttime+'z'
+if flighttime[-1] != 'Z':
+    flighttime = flighttime+'Z'
 
 if base_dir[-1] != '/':
     base_dir = base_dir+'/'
@@ -82,15 +76,17 @@ shutil.copyfile(base_dir+'RAW/'+fname, base_dir+'STAGE/'+new_fname)
 check_vars_atts(base_dir+'STAGE/',new_fname)
 
 
-# # # STEP 3. Upload
+# # # STEP 3. Upload # # #
 
+print('')
 proceed = input('    Your file is ready to upload to the bucket. Would you like to proceed? enter y or n: ')
+print('')
 
 if proceed == 'n':
     print('    Exiting without upload to bucket.')
     sys.exit()
 else:
-    upload_file(base_dir+'STAGE/',new_fname)
+    upload_file(base_dir+'STAGE/',new_fname,operatorID,airframeID)
     
 
 

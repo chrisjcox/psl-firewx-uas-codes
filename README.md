@@ -29,6 +29,9 @@ Most important for the user:
                       python3 openS3.py -t entry   
                     This would show contents of the UASDC product bucket:
                       python3 openS3.py -t product
+                    Optionally, you can also -i NNN to specify the OperatorID,
+                    which is useful because without it output is truncated for
+                    populous folders.                    
 
 - process_UASDC.py: This is your main code. 
 
