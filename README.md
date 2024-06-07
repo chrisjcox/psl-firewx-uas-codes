@@ -18,6 +18,7 @@ Most important for the user:
 - access_info.py: Access information for the AWS S3 cloud. **This file contains sensitive information, thus this repo is not visible outside the research team.**
 
 - openS3.py: This is a tool to query the contents of the AWS S3 cloud
+
       SUMMARY      : This is a set of tools that can be used to open the AWS S3
                     bucket and display what is inside.
     
@@ -30,6 +31,7 @@ Most important for the user:
                       python3 openS3.py -t product
 
 - process_UASDC.py: This is your main code. 
+
       SUMMARY      : This is the only function the flight crew needs to use.
                     Driver for processing routines for PSL's UASDC participation.
                     Once the netCDF produced by the drone is transferred to the 
