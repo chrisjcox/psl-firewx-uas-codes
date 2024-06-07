@@ -35,7 +35,7 @@ Most important for the user:
 
 - process_UASDC.py: This is your main code. 
 
-      SUMMARY      : This is the only function the flight crew needs to use.
+      SUMMARY      : This is the primary function the flight crew will use.
                     Driver for processing routines for PSL's UASDC participation.
                     Once the netCDF produced by the drone is transferred to the 
                     STAGE directory (see below), the following will happen:
@@ -51,9 +51,9 @@ Most important for the user:
                         successful deposit to product bucket.                     
     
       USAGE        : python3 process_UASDC.py -o 007 -a AstonMartinDB5 -t 19641222000000 -d /Users/Connery/London/ -f goldfinger.nc
-                                                |      |                 |                 |
-                                                v      v                 v                 v
-                    arguments                   opID   airframeID        yyyymmddhhmmss    base directory
+                                                 |      |                 |                 |                         |
+                                                 v      v                 v                 v                         v
+                    arguments                    opID   airframeID        yyyymmddhhmmss    base directory            the file name
     
       PREP         : Create two folders, RAW and STAGE in the base directory,
                     which is the directory you specify as an argument when
