@@ -13,7 +13,56 @@ Data management for UASDC will be hosted in Amazon Web Services (AWS) cloud (Ama
 
 A general description of the steps to use the toolkit:
 
-...
+Most important for the user:
+
+- access_info.py: Access information for the AWS S3 cloud. **This file contains sensitive information, thus this repo is not visible outside the research team.**
+
+- openS3.py: This is a tool to query the contents of the AWS S3 cloud
+      SUMMARY      : This is a set of tools that can be used to open the AWS S3
+                    bucket and display what is inside.
+    
+      USAGE        : Note that you cannot access AWS S3 while using PSL VPN.
+                    This would show the buckets available to us:
+                      python3 openS3.py -t product
+                    This would show contents of the UASDC entry bucket:
+                      python3 openS3.py -t entry   
+                    This would show contents of the UASDC product bucket:
+                      python3 openS3.py -t product
+
+- process_UASDC.py: This is your main code. 
+      SUMMARY      : This is the only function the flight crew needs to use.
+                    Driver for processing routines for PSL's UASDC participation.
+                    Once the netCDF produced by the drone is transferred to the 
+                    STAGE directory (see below), the following will happen:
+        
+                    1) File will be copied to the UPLOAD directory and renamed
+                        according to UASDC specificiations.
+                    2) File variable names and attributes will be checked for
+                        conformity with UASDC specifications and corrected 
+                        as necessary.
+                    3) File will be uploaded to the AWS Bucket.
+                    4) Status of upload will be provided and user will be
+                        prompted for monitoring of UASDC Data Pipeline for
+                        successful deposit to product bucket.                     
+    
+      USAGE        : python3 process_UASDC.py -o 007 -a AstonMartinDB5 -t 19641222000000 -d /Users/Connery/London/ -f goldfinger.nc
+                                                |      |                 |                 |
+                                                v      v                 v                 v
+                    arguments                   opID   airframeID        yyyymmddhhmmss    base directory
+    
+      PREP         : Create two folders, RAW and STAGE in the base directory,
+                    which is the directory you specify as an argument when
+                    executing the function. When you transfer a file from the 
+                    ground station, store in in RAW then ecexute this code.
+
+Sort of important for the user:
+- wmo_definitions.py: This is just a series of dictionaries containing information about the WMO requirement formats and some expectations for the netCDFS we will process. If new aircraft or updates to aircraft firmware are made (i.e., changes to aircraft netCDFs) may need to update this.
+ 
+
+User doesn't need to worry much about it:
+
+- PSL_UASDC_check_attributes.py: Sub that does the check atts.
+- PSD_UASDC_uploadfiles.py: Sub that does the uploading.
 
 ## Required software:
 
@@ -22,7 +71,7 @@ The following python packages are required:
 ~~~
 python  ≥ 3.8
 netCDF4 ≥ 1.3.0
-boto3 ≥ ??
+boto3 ≥ Boto3 (1.28.64?) Python module supported for Python 3.8+ 
 ~~~
 
 ## Authors and acknowledgment
