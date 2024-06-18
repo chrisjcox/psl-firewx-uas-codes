@@ -51,12 +51,24 @@ args = parser.parse_args()
 
 if args.operatorID: operatorID = args.operatorID
 if args.airframeID: airframeID = args.airframeID
-if args.flighttime: flighttime = args.flighttime
 if args.basedir:    base_dir = args.basedir
 if args.filename:   fname = args.filename
 
-if flighttime[-1] != 'Z':
+# try to get the flight time from the file name if not passed as arg. if that 
+# fails, tell user to manually supply it.
+if args.flighttime: 
+    flighttime = args.flighttime
+    if flighttime[-1] != 'Z':
+        flighttime = flighttime+'Z'
+else:
+    flighttime = fname[0:14]
+    if not flighttime.isdigit():
+        print('')
+        print('    Exiting. Filename unexpected format. Please supply flighttime as argument; i.e., -t yyyymmddhhmmss')
+        print('')
+        sys.exit()        
     flighttime = flighttime+'Z'
+
 
 if base_dir[-1] != '/':
     base_dir = base_dir+'/'
