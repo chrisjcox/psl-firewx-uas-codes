@@ -35,17 +35,6 @@ def check_vars_atts(path,fname):
     
     # # # STEP 1. Change the time stamp from seconds since flight to epoch # # #
     
-    if os.path.exists(path+fname):
-        
-        print('')
-        proceed = input('    The file already exists in STAGE. Do you want to overwirte it? enter y or n: ')
-        print('')
-        
-        if proceed == 'n':
-            print('    Exiting. Nothing was accomplished.')
-            print('')
-            sys.exit()
-
     # We need to change the values of the time stamp, which are in seconds 
     # since flight time, but need to be seconds since epoch
     time_var = file.variables['time']

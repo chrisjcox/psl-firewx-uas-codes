@@ -36,7 +36,7 @@
 #python3 process_UASDC.py -o 007 -a AstonMartinDB5 -t 19641222000000 -d /Users/ccox/Documents/Projects/2024/FireWeather/compare_files/ -f 20240501221756_Lat_47.5738578_Lon_9.0461255.nc
 
 # Prologue    
-import argparse, shutil, sys
+import argparse, shutil, sys, os
 from PSL_UASDC_check_attributes import check_vars_atts
 from PSL_UASDC_uploadfiles import upload_file
 
@@ -66,6 +66,18 @@ if base_dir[-1] != '/':
 
 # format: UASDC_operatorID_airframeID_YYYYMMDDHHMMSSZ.nc
 new_fname = 'UASDC_'+operatorID+'_'+airframeID+'_'+flighttime+'.nc'
+
+
+if os.path.exists(base_dir+'STAGE/'+new_fname):
+    
+    print('')
+    proceed = input('    The file already exists in STAGE. Do you want to overwrite it? enter y or n: ')
+    print('')
+    
+    if proceed == 'n':
+        print('    Exiting. Nothing was accomplished.')
+        print('')
+        sys.exit()
 
 # copy file from RAW to STAGE, renaming as we go
 shutil.copyfile(base_dir+'RAW/'+fname, base_dir+'STAGE/'+new_fname)
