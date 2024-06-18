@@ -37,6 +37,7 @@
 
 # Prologue    
 import argparse, shutil, sys, os
+import netCDF4 as nc
 from PSL_UASDC_check_attributes import check_vars_atts
 from PSL_UASDC_uploadfiles import upload_file
 
@@ -50,9 +51,13 @@ parser.add_argument('-f', '--filename', metavar='str', help='File to process')
 args = parser.parse_args()
 
 if args.operatorID: operatorID = args.operatorID
-if args.airframeID: airframeID = args.airframeID
 if args.basedir:    base_dir = args.basedir
 if args.filename:   fname = args.filename
+
+# check basedir for format
+if base_dir[-1] != '/':
+    base_dir = base_dir+'/'
+
 
 # try to get the flight time from the file name if not passed as arg. if that 
 # fails, tell user to manually supply it.
@@ -69,9 +74,18 @@ else:
         sys.exit()        
     flighttime = flighttime+'Z'
 
-
-if base_dir[-1] != '/':
-    base_dir = base_dir+'/'
+# try to get the platform ID (airframe ID) from the globals if not provided
+if args.airframeID: 
+    airframeID = args.airframeID
+else:
+    file = nc.Dataset(base_dir+'RAW/'+fname,'r')
+    try:
+        airframeID = file.getncattr('platform_name')
+    except:       
+        print('')
+        print('    Exiting. platform_name not found in global atts. Please supply it as airframeID argument; i.e., -a name')
+        print('')
+    
 
 
 # # # STEP 1. Move and rename the file  # # #
