@@ -26,6 +26,8 @@
 #                                             v      v                 v                 v
 #                 arguments                   opID   airframeID        yyyymmddhhmmss    base directory
 #
+#                 Note that -a and -t are optional arguments. -o, -d, and -f are required. The order arguments are entered does not matter.
+#
 #  PREP         : Create two folders, RAW and STAGE in the base directory,
 #                 which is the directory you specify as an argument when
 #                 executing the function. When you transfer a file from the 
