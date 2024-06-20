@@ -39,10 +39,10 @@
 #python3 process_UASDC.py -o 007 -a AstonMartinDB5 -t 19641222000000 -d /Users/ccox/Documents/Projects/2024/FireWeather/compare_files/ -f 20240501221756_Lat_47.5738578_Lon_9.0461255.nc
 
 # Prologue    
-import argparse, shutil, sys, os
+import argparse, shutil, sys, os, time
 import netCDF4 as nc
 from PSL_UASDC_check_attributes import check_vars_atts
-from PSL_UASDC_uploadfiles import upload_file
+from PSL_UASDC_uploadfiles import upload_file, download_bufr
 
 # parse arguments
 parser = argparse.ArgumentParser()
@@ -129,8 +129,19 @@ if proceed != 'y':
 else:
     upload_file(base_dir+'STAGE/',new_fname,operatorID,airframeID)
     
+    
+# # # STEP 4. check for success # # #
 
+print('')
+print('    Checking for BUFR file in product bucket. Wait 5 sec.')
+time.sleep(5)    # Pause 5 seconds
 
+try:
+    download_bufr(base_dir+'BUFR/',new_fname,operatorID,airframeID)
+except:
+    print('')
+    print('    No bufr file found in product bucket.')
+    print('')   
 
-
-
+print('')
+print('    BUFR file found in product bucket and downloaded.')
