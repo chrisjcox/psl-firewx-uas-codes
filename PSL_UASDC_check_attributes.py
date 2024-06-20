@@ -13,9 +13,8 @@
 #
 #  DEPENDENCIES : netCDF4 1.6.2+ 
 
-def check_vars_atts(path,fname):
+def check_vars_atts(path,fname,airframeID):
     
-    import os, sys
     import netCDF4 as nc
     from wmo_definitions import define_wmo_globals, define_wmo_atts, define_alt_names
     from datetime import datetime
@@ -110,26 +109,32 @@ def check_vars_atts(path,fname):
     
     
     # # # STEP 4. Check global attributes # # # 
-    
+
     # make a dictionary of all attributes and delete the att
     attdict = dict()        
     for att in file.ncattrs():
         attdict.update({att:file.getncattr(att)})
         file.delncattr(att)
-    
-    # write the globals wmo expects                    
+
+    # write the globals wmo expects   
+    pn = ''                 
     for att in global_atts.items():
      
         if att[0] not in attdict: 
             print('    Warning: '+att[0]+' not found in file global attributes')    
     
         if att[0] == 'platform_name':
-            file.setncattr('platform_name',attdict['platform_name'])
+            #file.setncattr('platform_name',attdict['platform_name'])
+            file.setncattr('platform_name',airframeID)
+            pn = attdict['platform_name'] # will move this to source
         elif att[0] == 'flight_id':
             file.setncattr('flight_id',attdict['flight_id'])   
         elif att[0] == 'processing_level':
             file.setncattr('processing_level','raw') 
             print('    Assigning processing level to raw.')
+        elif att[0] == 'source':
+            file.setncattr('source',pn)
+            print('    Assigning default platform_name to source att.')
         else:
             file.setncattr(att[0],att[1]) 
         

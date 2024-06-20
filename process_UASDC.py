@@ -26,7 +26,8 @@
 #                                             v      v                 v                 v
 #                 arguments                   opID   airframeID        yyyymmddhhmmss    base directory
 #
-#                 Note that -a and -t are optional arguments. -o, -d, and -f are required. The order arguments are entered does not matter.
+#                 Note that -a and -t are optional arguments. -o, -d, and -f are required. -a is needed if you want to change what is in the raw file. 
+#                 The order arguments are entered does not matter.
 #
 #  PREP         : Create two folders, RAW and STAGE in the base directory,
 #                 which is the directory you specify as an argument when
@@ -113,7 +114,7 @@ shutil.copyfile(base_dir+'RAW/'+fname, base_dir+'STAGE/'+new_fname)
 
 # # # STEP 2. Check vars and atts # # #
 
-check_vars_atts(base_dir+'STAGE/',new_fname)
+check_vars_atts(base_dir+'STAGE/',new_fname,airframeID)
 
 
 # # # STEP 3. Upload # # #

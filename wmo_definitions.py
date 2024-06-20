@@ -26,6 +26,7 @@ def define_wmo_globals():
         'flight_id'                     :'', # e.g., 'JBCC_1500m_VP' 
         'site_terrain_elevation_height' :'', # e.g., '3200m'
         'processing_level'              :'raw', 
+        'source'                        : '',
     }
     
     return global_atts
