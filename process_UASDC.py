@@ -103,7 +103,7 @@ if os.path.exists(base_dir+'STAGE/'+new_fname):
     proceed = input('    The file already exists in STAGE. Do you want to overwrite it? enter y or n: ')
     print('')
     
-    if proceed == 'n':
+    if proceed != 'y':
         print('    Exiting. Nothing was accomplished.')
         print('')
         sys.exit()
@@ -123,7 +123,7 @@ print('')
 proceed = input('    Your file is ready to upload to the bucket. Would you like to proceed? enter y or n: ')
 print('')
 
-if proceed == 'n':
+if proceed != 'y':
     print('    Exiting without upload to bucket.')
     sys.exit()
 else:
