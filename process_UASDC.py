@@ -43,6 +43,7 @@ import argparse, shutil, sys, os, time
 import netCDF4 as nc
 from PSL_UASDC_check_attributes import check_vars_atts
 from PSL_UASDC_uploadfiles import upload_file, download_bufr
+import ftplib
 
 # parse arguments
 parser = argparse.ArgumentParser()
@@ -145,3 +146,37 @@ except:
 
 print('')
 print('    BUFR file found in product bucket and downloaded.')
+
+
+# # # STEP 5. Upload to GSL ftp # # #
+
+print('')
+proceed = input('    You may now upload *nc and *.bufr to GSL. Would you like to proceed? enter y or n: ')
+print('')
+
+
+if proceed != 'y':
+    print('    Exiting without upload to GSL.')
+    sys.exit()
+else:    
+    # upload the bufr
+    os.chdir(base_dir+'BUFR/')
+    bufr_name = os.path.splitext(new_fname)[0]+'.bufr'
+    session = ftplib.FTP(***REMOVED***)
+    session.cwd('its/psl_uas_fire_wx')
+    with open(bufr_name, 'rb') as file: session.storbinary('STOR '+bufr_name, file)
+    file.close()                                    # close file and FTP
+    session.quit()    
+    # upload the netcdf
+    os.chdir(base_dir+'STAGE/')
+    session = ftplib.FTP(***REMOVED***)
+    session.cwd('its/psl_uas_fire_wx')
+    with open(new_fname, 'rb') as file: session.storbinary('STOR '+new_fname, file)
+    file.close()                                    # close file and FTP
+    session.quit()
+    print('')
+    print('    Files uploaded to GSL.')    
+    
+    
+
+
