@@ -32,7 +32,9 @@ def check_vars_atts(path,fname,airframeID):
     file = nc.Dataset(path+fname,'a')
     
     
-    # # # STEP 1. Change the time stamp from seconds since flight to epoch # # #
+    # # # STEP 1. Make some changes to data contents, just units!
+    
+    # (a) Change the time stamp from seconds since flight to epoch # # #
     
     # We need to change the values of the time stamp, which are in seconds 
     # since flight time, but need to be seconds since epoch
@@ -43,6 +45,9 @@ def check_vars_atts(path,fname,airframeID):
     if max(time_var) < 86400:
         time_var[:] = time_var[:]+add_offset
      
+    # (b) Change rel_hum from fraction to %
+    file.variables['rel_hum'][:] = file.variables['rel_hum'][:]*100
+
 
     # # # STEP 2. Rename the variable names # # # 
     
