@@ -24,7 +24,7 @@ def define_wmo_globals():
         'featureType'                   :'trajectory',
         'platform_name'                 :'', # airframeID 
         'flight_id'                     :'', # e.g., 'JBCC_1500m_VP' 
-        'site_terrain_elevation_height' :'', # e.g., '3200m'
+        'site_terrain_elevation_height' :'272m', # this is the Stillwater Mesonet official elevation
         'processing_level'              :'raw', 
         'source'                        : '',
     }

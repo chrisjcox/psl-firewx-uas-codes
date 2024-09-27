@@ -44,6 +44,7 @@ import netCDF4 as nc
 from PSL_UASDC_check_attributes import check_vars_atts
 from PSL_UASDC_uploadfiles import upload_file, download_bufr
 import ftplib
+from datetime import datetime
 
 # parse arguments
 parser = argparse.ArgumentParser()
@@ -62,6 +63,8 @@ if args.filename:   fname = args.filename
 if base_dir[-1] != '/':
     base_dir = base_dir+'/'
 
+# and open the file
+file = nc.Dataset(base_dir+'RAW/'+fname,'r')
 
 # try to get the flight time from the file name if not passed as arg. if that 
 # fails, tell user to manually supply it.
@@ -70,7 +73,9 @@ if args.flighttime:
     if flighttime[-1] != 'Z':
         flighttime = flighttime+'Z'
 else:
-    flighttime = fname[0:14]
+    #flighttime = fname[0:14] # datetime.strptime(file.variables['time'].getncattr('units')[14:-1], '%Y-%m-%dT%H:%M:%S')
+    ftmp = file.variables['time'].getncattr('units')[14:-1]
+    flighttime = ftmp[0:4]+ftmp[5:7]+ftmp[8:10]+ftmp[11:13]+ftmp[14:16]+ftmp[17:19] 
     if not flighttime.isdigit():
         print('')
         print('    Exiting. Filename unexpected format. Please supply flighttime as argument; i.e., -t yyyymmddhhmmss')
@@ -82,7 +87,6 @@ else:
 if args.airframeID: 
     airframeID = args.airframeID
 else:
-    file = nc.Dataset(base_dir+'RAW/'+fname,'r')
     try:
         airframeID = file.getncattr('platform_name')
     except:       
@@ -108,6 +112,8 @@ if os.path.exists(base_dir+'STAGE/'+new_fname):
         print('    Exiting. Nothing was accomplished.')
         print('')
         sys.exit()
+    else:
+        os.remove(base_dir+'STAGE/'+new_fname)
 
 # copy file from RAW to STAGE, renaming as we go
 shutil.copyfile(base_dir+'RAW/'+fname, base_dir+'STAGE/'+new_fname)

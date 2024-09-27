@@ -29,8 +29,8 @@ def check_vars_atts(path,fname,airframeID):
     
     
     # open the file
-    file = nc.Dataset(path+fname,'a')
-    
+    file = nc.Dataset(path+fname,'r+')
+
     
     # # # STEP 1. Make some changes to data contents, just units!
     
@@ -68,19 +68,20 @@ def check_vars_atts(path,fname,airframeID):
     # # # STEP 3. Check the attributes # # # 
     
     for file_var_name, file_var_atts in file.variables.items():
-        
+    
+        # make a dictionary of all attributes and delete the att
+        attdict = dict()        
+        for att in file.variables[file_var_name].ncattrs():
+            attdict.update({att:file.variables[file_var_name].getncattr(att)})
+            file.variables[file_var_name].delncattr(att)
+
+
         # if the variable in the file is not requried by WMO, we will still update 
         # the attributes to be consistent
         if file_var_name not in wmo_atts:
             
-            # make a dictionary of all attributes and delete the att
-            attdict = dict()        
-            for att in file.variables[file_var_name].ncattrs():
-                attdict.update({att:file.variables[file_var_name].getncattr(att)})
-                file.variables[file_var_name].delncattr(att)
-    
             # the first att will be fill value
-            file.variables[file_var_name].setncattr(file_var_name+'__FillValue','NaN')
+            file.variables[file_var_name].setncattr('varname__FillValue','NaN')
            
             for att in attdict.items():
                 
@@ -91,27 +92,20 @@ def check_vars_atts(path,fname,airframeID):
             
         # if the variable is a wmo requirement
         elif file_var_name in wmo_atts:
-            
-            # make a dictionary of all attributes and delete the att
-            attdict = dict()        
-            for att in file.variables[file_var_name].ncattrs():
-                attdict.update({att:file.variables[file_var_name].getncattr(att)})
-                file.variables[file_var_name].delncattr(att)
-    
+                  
             # write wmo atts
             for att in wmo_atts[file_var_name].items():    
                 if att[0] == 'varname__FillValue':
-                    file.variables[file_var_name].setncattr(file_var_name+'__FillValue','NaN')
+                    file.variables[file_var_name].setncattr('varname__FillValue','NaN')
                 else:
                     file.variables[file_var_name].setncattr(att[0], att[1])
-                
+
             # write any extra atts that remain    
-            for att in attdict.items():  
-                if att not in file.variables[file_var_name].ncattrs():
+            for att in attdict.items(): 
+                if att[0] not in file.variables[file_var_name].ncattrs():
                     if att[0] != 'standard_name':
                         file.variables[file_var_name].setncattr(att[0],att[1])
-    
-    
+        
     
     # # # STEP 4. Check global attributes # # # 
 
