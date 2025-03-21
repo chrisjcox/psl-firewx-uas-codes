@@ -2,7 +2,7 @@
 
 def access_info():
     
-    # CONFIG OPTIONS
+    # CONFIG OPTIONS 
     #   Instead of using a config file, we will keep it self-contained and relay 
     #   authentication credentials to AWS/boto3 through environmental variables. 
     #   Hopefully this keeps things portable and less prone to premissions issues.
