@@ -100,4 +100,5 @@ Code contributors:
 TBD
 
 ## Project status
-This project is currently a non-public collaborative development space for the PSL team.
+
+Completed
