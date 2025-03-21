@@ -15,7 +15,7 @@ A general description of the steps to use the toolkit:
 
 Most important for the user:
 
-- access_info.py: Access information for the AWS S3 cloud. **This file contains sensitive information, thus this repo is not visible outside the research team.**
+- access_info.py: Access information for the AWS S3 cloud. **redacted.**
 
 - openS3.py: This is a tool to query the contents of the AWS S3 cloud
 
