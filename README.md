@@ -87,7 +87,7 @@ Project PI:
 * Janet Intrieri (NOAA/PSL) - <janet.intrieri@noaa.gov>
 
 Project Team:
-* Gijs de Boer (CIRES, NOAA/PSL) - <gijs.deboer@noaa.gov>
+* Brian Butteworth (CIRES, NOAA/PSL) - <brian.butterworth@noaa.gov>
 * Jackson Osborn (NOAA/PSL) - <jackson.osborn@noaa.gov>
 * Christopher J. Cox (NOAA/PSL) - <christopher.j.cox@noaa.gov>
 
