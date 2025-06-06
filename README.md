@@ -84,7 +84,7 @@ boto3 ≥ Boto3 (1.28.64?) Python module supported for Python 3.8+
 ## Authors and acknowledgment
 
 Project PI:
-* Janet Intrieri (NOAA/PSL) - <janet.intrieri@noaa.gov>
+* Janet Intrieri (NOAA/PSL)
 
 Project Team:
 * Brian Butterworth (CIRES, NOAA/PSL) - <brian.butterworth@noaa.gov>
@@ -97,7 +97,16 @@ Code contributors:
 
 ## License
 
-TBD
+Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
+
+This work is licensed under a
+[Creative Commons Attribution 4.0 International License][cc-by].
+
+[![CC BY 4.0][cc-by-image]][cc-by]
+
+[cc-by]: http://creativecommons.org/licenses/by/4.0/
+[cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
+[cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 
 ## Project status
 
